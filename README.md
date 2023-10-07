@@ -1,3 +1,3 @@
 # AA-ArticleSearch
-Starter code for AND102 Lab 4
+Arlon Arvesu
 [GIF Walkthrough](https://i.imgur.com/fV77b2A.gif)
