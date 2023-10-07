@@ -20,16 +20,18 @@ fun createJson() = Json {
 }
 
 private const val TAG = "MainActivity/"
-private const val SEARCH_API_KEY = BuildConfig.API_KEY
+private const val SEARCH_API_KEY = "odEC0Wyzy6MLXRG8S5QooDfBYl9tnAo5"
 private const val ARTICLE_SEARCH_URL =
     "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=${SEARCH_API_KEY}"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var articlesRecyclerView: RecyclerView
     private lateinit var binding: ActivityMainBinding
+    private val articles = mutableListOf<Article>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
@@ -42,6 +44,9 @@ class MainActivity : AppCompatActivity() {
             val dividerItemDecoration = DividerItemDecoration(this, it.orientation)
             articlesRecyclerView.addItemDecoration(dividerItemDecoration)
         }
+
+        val articleAdapter = ArticleAdapter(this, articles)
+        articlesRecyclerView.adapter = articleAdapter
 
         val client = AsyncHttpClient()
         client.get(ARTICLE_SEARCH_URL, object : JsonHttpResponseHandler() {
@@ -58,11 +63,17 @@ class MainActivity : AppCompatActivity() {
                 Log.i(TAG, "Successfully fetched articles: $json")
                 try {
                     // TODO: Create the parsedJSON
-
                     // TODO: Do something with the returned json (contains article information)
+                    val parsedJson = createJson().decodeFromString(
+                        SearchNewsResponse.serializer(),
+                        json.jsonObject.toString()
+                    )
 
+                    parsedJson.response?.docs?.let { list ->
+                        articles.addAll(list)
+                        articleAdapter.notifyDataSetChanged()
+                    }
                     // TODO: Save the articles and reload the screen
-
                 } catch (e: JSONException) {
                     Log.e(TAG, "Exception: $e")
                 }
